@@ -924,32 +924,31 @@ class NewsAnalyzer:
         has_notification = self._has_notification_configured()
         cfg = self.ctx.config
 
-# 检查是否有有效内容（热榜、RSS 或独立展示区）
-has_news_content = self._has_valid_content(stats, new_titles)
-has_rss_content = bool(rss_items and len(rss_items) > 0)
-has_standalone_content = bool(
-    standalone_data
-    and (
-        standalone_data.get("platforms")
-        or standalone_data.get("rss_feeds")
-    )
-)
-has_any_content = has_news_content or has_rss_content or has_standalone_content
+        # 检查是否有有效内容（热榜、RSS 或独立展示区）
+        has_news_content = self._has_valid_content(stats, new_titles)
+        has_rss_content = bool(rss_items and len(rss_items) > 0)
+        has_standalone_content = bool(
+            standalone_data
+            and (
+                standalone_data.get("platforms")
+                or standalone_data.get("rss_feeds")
+            )
+        )
+        has_any_content = has_news_content or has_rss_content or has_standalone_content
 
-# 计算热榜 / RSS / 独立展示区内容条数
-news_count = sum(len(stat.get("titles", [])) for stat in stats) if stats else 0
-rss_count = sum(stat.get("count", 0) for stat in rss_items) if rss_items else 0
-standalone_count = 0
-if standalone_data:
-    standalone_count += sum(
-        len(platform.get("items", []))
-        for platform in standalone_data.get("platforms", [])
-    )
-    standalone_count += sum(
-        len(feed.get("items", []))
-        for feed in standalone_data.get("rss_feeds", [])
-    )
-
+        # 计算热榜 / RSS / 独立展示区内容条数
+        news_count = sum(len(stat.get("titles", [])) for stat in stats) if stats else 0
+        rss_count = sum(stat.get("count", 0) for stat in rss_items) if rss_items else 0
+        standalone_count = 0
+        if standalone_data:
+            standalone_count += sum(
+                len(platform.get("items", []))
+                for platform in standalone_data.get("platforms", [])
+            )
+            standalone_count += sum(
+                len(feed.get("items", []))
+                for feed in standalone_data.get("rss_feeds", [])
+            )
 
         if (
             cfg["ENABLE_NOTIFICATION"]
@@ -961,11 +960,10 @@ if standalone_data:
             if news_count > 0:
                 content_parts.append(f"热榜 {news_count} 条")
             if rss_count > 0:
-    content_parts.append(f"RSS {rss_count} 条")
-if standalone_count > 0:
-    content_parts.append(f"独立展示区 {standalone_count} 条")
-total_count = news_count + rss_count + standalone_count
-
+                content_parts.append(f"RSS {rss_count} 条")
+            if standalone_count > 0:
+                content_parts.append(f"独立展示区 {standalone_count} 条")
+            total_count = news_count + rss_count + standalone_count
             print(f"[推送] 准备发送：{' + '.join(content_parts)}，合计 {total_count} 条")
 
             # 调度系统决策
@@ -1038,8 +1036,8 @@ total_count = news_count + rss_count + standalone_count
         ):
             mode_strategy = self._get_mode_strategy()
             if self.report_mode == "incremental":
-if not has_rss_content and not has_standalone_content:
-    print("跳过通知：增量模式下未检测到匹配的新闻和RSS")
+                if not has_rss_content and not has_standalone_content:
+                    print("跳过通知：增量模式下未检测到匹配的新闻和RSS")
                 else:
                     print("跳过通知：增量模式下新闻未匹配到关键词")
             else:
